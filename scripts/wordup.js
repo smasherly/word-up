@@ -74,7 +74,7 @@ function checkIfWordIsReal(word) {
     // make an AJAX call to the Pearson API
     $.ajax({
         // TODO 13 what should the url be?
-        url: "www.todo13.com",
+        url: "http://api.pearson.com/v2/dictionaries/lasde/entries?headword=" + word,
         success: function(response) {
             console.log("We received a response from Pearson!");
 
@@ -85,14 +85,23 @@ function checkIfWordIsReal(word) {
             // Replace the 'true' below.
             // If the response contains any results, then the word is legitimate.
             // Otherwise, it is not.
-            var theAnswer = true;
 
+				if (response.results.length > 0){
+					model.wordSubmissions.pop();
+       				model.wordSubmissions.push({ word: word , isRealWord : true});
+
+				}
+				else{
+				model.wordSubmissions.pop();
+				model.wordSubmissions.push({ word: word , isRealWord : false});
+				}
             // TODO 15
             // Update the corresponding wordSubmission in the model
 
 
             // re-render
             render();
+
         },
         error: function(err) {
             console.log(err);
@@ -144,6 +153,8 @@ function render() {
 
     // TODO 11
     // Render the word submissions
+    var wordSubmission = model.wordSubmissions.map(wordSubmissionChip)
+    $("#word-submissions").append(wordSubmission);
 
 
     // Set the value of the textbox
@@ -204,23 +215,38 @@ function letterChip(letter) {
 function wordSubmissionChip(wordSubmission) {
     var wordChip = $("<span></span>")
         .text(wordSubmission.word)
-        .attr("class", "tag tag-lg word-submission");
+        .attr("class", "tag tag-lg word-submissions");
 
     // if we know the status of this word (real word or not), then add a green score or red X
-    if (wordSubmission.hasOwnProperty("isRealWord")) {
-        var scoreChip = $("<span></span>").text("⟐");
+    if (wordSubmission["isRealWord"]==true) {
+        var scoreChip = $("<span></span>")
+
         // TODO 17
         // give the scoreChip appropriate text content
 
+          .text(wordScore(wordSubmission.word))
         // TODO 18
         // give the scoreChip appropriate css classes
+		      .attr("class", "tag tag-sm tag-primary");
 
         // TODO 16
         // append scoreChip into wordChip
+    }
+    else{
+      var scoreChip = $("<span></span>")
 
+      // TODO 17
+      // give the scoreChip appropriate text content
+        .text("X")
+      // TODO 18
+      // give the scoreChip appropriate css classes
+        .attr("class", "tag tag-sm tag-danger");
+
+      // TODO 16
+      // append scoreChip into wordChip
     }
 
-    return wordChip;
+    return wordChip.append( [scoreChip] );
 }
 
 /**
@@ -293,7 +319,7 @@ function isDisallowedLetter(letter) {
     // console.log(model.allowedLetters);
     // This should return true if the letter is not an element of
     // the .allowedLetters list in the model
-    if (model.allowedLetters.indexOf(letter) <= 0){
+    if (model.allowedLetters.indexOf(letter) <= -1){
       return true
     }
 
@@ -315,7 +341,11 @@ function disallowedLettersInWord(word) {
 function containsOnlyAllowedLetters(word) {
     // TODO 12
     // Return the actual answer.
-    return true;
+	funcLength = disallowedLettersInWord(word)
+	if (funcLength.length <= 0){
+	return true
+
+	}
 }
 
 /**
