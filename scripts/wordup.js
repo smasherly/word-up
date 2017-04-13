@@ -53,7 +53,27 @@ function addNewWordSubmission(word) {
     // Do we already have a wordSubmission with this word?
     // TODO 21
     // replace the hardcoded 'false' with the real answer
-    var alreadyUsed = false;
+var alreadyUsed = '';
+
+var wlist = model.wordSubmissions;
+
+
+var result = wlist.map(function(a) {return a.word;});
+console.log(result);
+
+function isWord (element) {
+    return result[element] === word;
+}
+
+// Using the countries array the following condition should return true
+if (Object.keys(result).some(isWord)) {
+    alreadyUsed = true;
+}
+else{
+	alreadyUsed = false;
+}
+
+console.log(alreadyUsed);
 
     // if the word is valid and hasn't already been used, add it
     if (containsOnlyAllowedLetters(word) && alreadyUsed == false) {
@@ -61,6 +81,7 @@ function addNewWordSubmission(word) {
         // and now we must also determine whether this is actually a real word
         checkIfWordIsReal(word);
     }
+	
 }
 
 /**
@@ -76,10 +97,10 @@ function checkIfWordIsReal(word) {
         // TODO 13 what should the url be?
         url: "http://api.pearson.com/v2/dictionaries/lasde/entries?headword=" + word,
         success: function(response) {
-            console.log("We received a response from Pearson!");
+            // console.log("We received a response from Pearson!");
 
             // let's print the response to the console so we can take a looksie
-            console.log(response);
+            // console.log(response);
 
             // TODO 14
             // Replace the 'true' below.
@@ -376,7 +397,9 @@ function wordScore(word) {
     // TODO 19
     // Replace the empty list below.
     // Map the list of letters into a list of scores, one for each letter.
-    var letterScores = [];
+
+    var letterScores = letters.map(letterScore);
+
 
     // return the total sum of the letter scores
     return letterScores.reduce(add, 0);
@@ -400,7 +423,8 @@ function currentScore() {
 
     // TODO 20
     // return the total sum of the word scores
-    return 0;
+    return wordScores.reduce(add, 0);
+    // return 0;
 }
 
 
